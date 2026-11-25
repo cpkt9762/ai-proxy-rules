@@ -5,12 +5,8 @@ on:
     branches:
       - main
     paths:
-      - "data/**"
-      - "scripts/**"
-      - "tests/**"
-      - "package.json"
+      - "data/sources/**"
       - "pnpm-lock.yaml"
-      - "tsconfig.json"
       - ".github/workflows/generate.yml"
   pull_request:
     paths:

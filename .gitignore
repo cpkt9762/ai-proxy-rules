@@ -3,6 +3,9 @@ coverage/
 *.log
 .DS_Store
 
+# Always track generated rule JSONs even when global gitignore ignores *.json
+!rules/**/*.json
+
 # Local editor and AI assistant state
 .claude/
 .codex/
