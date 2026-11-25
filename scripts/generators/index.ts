@@ -22,6 +22,18 @@ export function render(format: Format, target: RenderTarget): RenderedFile {
         extension: "json",
         content: renderSingBox(target)
       };
+    case "sing-box-domain":
+      return {
+        format,
+        extension: "json",
+        content: renderSingBoxDomain(target)
+      };
+    case "sing-box-ip":
+      return {
+        format,
+        extension: "json",
+        content: renderSingBoxIp(target)
+      };
     case "quantumult-x":
       return {
         format,
@@ -95,6 +107,35 @@ function renderSingBox(target: RenderTarget): string {
   appendSingBoxRule(rules, "process_name", target.rules.processName);
   appendSingBoxRule(rules, "ip_cidr", [...target.rules.ipCidr, ...target.rules.ipCidr6]);
 
+  return `${JSON.stringify({ version: 2, rules }, null, 2)}\n`;
+}
+
+function renderSingBoxDomain(target: RenderTarget): string {
+  return renderMergedSingBoxRule([
+    ["domain", target.rules.domain],
+    ["domain_suffix", target.rules.domainSuffix],
+    ["domain_keyword", target.rules.domainKeyword],
+    ["domain_regex", target.rules.domainRegex]
+  ]);
+}
+
+function renderSingBoxIp(target: RenderTarget): string {
+  return renderMergedSingBoxRule([
+    ["ip_cidr", [...target.rules.ipCidr, ...target.rules.ipCidr6]]
+  ]);
+}
+
+/**
+ * Emit a single-object headless rule-set so sing-box DNS rules flatten domain fields cleanly.
+ */
+function renderMergedSingBoxRule(fields: Array<[string, string[]]>): string {
+  const merged: Record<string, string[]> = {};
+  for (const [key, values] of fields) {
+    if (values.length > 0) {
+      merged[key] = values;
+    }
+  }
+  const rules = Object.keys(merged).length > 0 ? [merged] : [];
   return `${JSON.stringify({ version: 2, rules }, null, 2)}\n`;
 }
 

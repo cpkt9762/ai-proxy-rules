@@ -142,6 +142,67 @@ describe("generators", () => {
     expect(parsed.rules.every((rule: Record<string, string[]>) => !("ip_asn" in rule))).toBe(true);
   });
 
+  it("renders sing-box-domain json with only domain rules in a single merged object", () => {
+    const withProcess: ProviderSource = {
+      ...anthropic,
+      rules: {
+        ...anthropic.rules,
+        domainRegex: ["^claude-[0-9]+\\.example\\.com$"],
+        processName: ["Claude", "claude"]
+      }
+    };
+    const rendered = render("sing-box-domain", providerToTarget(withProcess));
+    const parsed = JSON.parse(rendered.content);
+
+    expect(rendered.extension).toBe("json");
+    expect(parsed).toEqual({
+      version: 2,
+      rules: [
+        {
+          domain: ["api.anthropic.com"],
+          domain_suffix: ["anthropic.com"],
+          domain_keyword: ["claude"],
+          domain_regex: ["^claude-[0-9]+\\.example\\.com$"]
+        }
+      ]
+    });
+  });
+
+  it("renders sing-box-domain with empty rules array when provider has no domains", () => {
+    const ipOnly: ProviderSource = {
+      provider: "ip-only",
+      name: "IP Only",
+      groups: [],
+      rules: {
+        domain: [],
+        domainSuffix: [],
+        domainKeyword: [],
+        domainRegex: [],
+        processName: ["claude"],
+        ipCidr: ["203.0.113.0/24"],
+        ipCidr6: [],
+        asn: []
+      }
+    };
+    const parsed = JSON.parse(render("sing-box-domain", providerToTarget(ipOnly)).content);
+    expect(parsed).toEqual({ version: 2, rules: [] });
+  });
+
+  it("renders sing-box-ip json with only IPv4 and IPv6 cidrs", () => {
+    const parsed = JSON.parse(render("sing-box-ip", providerToTarget(anthropic)).content);
+    expect(parsed).toEqual({
+      version: 2,
+      rules: [
+        {
+          ip_cidr: ["203.0.113.0/24", "2001:db8::/32"]
+        }
+      ]
+    });
+
+    const domainOnlyParsed = JSON.parse(render("sing-box-ip", providerToTarget(fixtureIde)).content);
+    expect(domainOnlyParsed).toEqual({ version: 2, rules: [] });
+  });
+
   it("renders quantumult x with the file ID as per-line policy", () => {
     const rendered = render("quantumult-x", providerToTarget(anthropic));
 

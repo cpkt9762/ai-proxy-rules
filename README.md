@@ -50,6 +50,67 @@ rules:
 
 `openai` / `global` 是已添加的规则集名称, `AI-US` / `AI-OVERSEAS` 替换为自己的节点或策略组名称.
 
+## sing-box 域名 / IP 拆分与 SRS 二进制规则（Fork 扩展）
+
+本 Fork（`cpkt9762/ai-proxy-rules`）在保留上游 `rules/sing-box/*.json` 完整规则的基础上，额外自动生成：
+
+- `rules/sing-box-domain/<name>.json` 与 `rules/sing-box-domain/<name>.srs`：**仅保留域名规则**（`domain`、`domain_suffix`、`domain_keyword`、`domain_regex`，合并为单条无头规则），剔除 `ip_cidr` 与 `process_name`，可直接用于 `dns.rules`。
+- `rules/sing-box-ip/<name>.json` 与 `rules/sing-box-ip/<name>.srs`：**仅保留 IP 段**（`ip_cidr`），方便路由规则将 IP 与域名彻底分离。
+- `rules/sing-box/<name>.srs`：由完整版 `rules/sing-box/<name>.json` 编译得到的二进制 `.srs`，可直接用于 `route.rules`。
+
+订阅示例（如 Anthropic / Claude 与全局海外 AI）：
+
+```text
+# DNS 专用纯域名（.srs 二进制）
+https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box-domain/anthropic.srs
+https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box-domain/global.srs
+
+# 路由专用纯 IP / 完整规则（.srs 二进制）
+https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box-ip/anthropic.srs
+https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box/global.srs
+```
+
+sing-box `dns.rules` 与 `route.rules` 配合示例：
+
+```json
+{
+  "dns": {
+    "rules": [
+      { "rule_set": ["ai-anthropic-domain"], "action": "route", "server": "claude-dns" },
+      { "rule_set": ["ai-global-domain"], "action": "route", "server": "ai-dns" }
+    ]
+  },
+  "route": {
+    "rule_set": [
+      {
+        "tag": "ai-anthropic-domain",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box-domain/anthropic.srs"
+      },
+      {
+        "tag": "ai-global-domain",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box-domain/global.srs"
+      },
+      {
+        "tag": "ai-anthropic-ip",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://cdn.jsdelivr.net/gh/cpkt9762/ai-proxy-rules@main/rules/sing-box-ip/anthropic.srs"
+      }
+    ],
+    "rules": [
+      { "rule_set": ["ai-anthropic-domain", "ai-anthropic-ip"], "action": "route", "outbound": "Claude" },
+      { "rule_set": ["ai-global-domain"], "action": "route", "outbound": "AIGC" }
+    ]
+  }
+}
+```
+
+> CI/CD 自动化：除每日同步工作流（`.github/workflows/generate.yml`）会在同步后自动编译 `.srs` 外，独立工作流 `.github/workflows/singbox-srs.yml` 也会在 `rules/sing-box/*.json`、`data/providers/**` 或构建脚本变更（包括 GitHub Sync fork 合并上游更新）或手动触发时自动提取域名/IP 并编译提交 `.srs`。
+
 ## 支持的服务
 
 <!-- provider-list:start -->

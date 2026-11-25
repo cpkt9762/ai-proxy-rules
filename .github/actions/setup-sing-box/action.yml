@@ -1,0 +1,23 @@
+name: Setup sing-box
+description: Download SagerNet/sing-box Linux amd64 release binary for rule-set compilation
+inputs:
+  token:
+    description: GitHub token for authenticated release download
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Download and install sing-box
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p "${RUNNER_TEMP}/sing-box-dl" "${RUNNER_TEMP}/bin"
+        gh release download -R SagerNet/sing-box --pattern "sing-box-*-linux-amd64.tar.gz" -D "${RUNNER_TEMP}/sing-box-dl"
+        TARBALL=$(ls "${RUNNER_TEMP}/sing-box-dl"/sing-box-*-linux-amd64.tar.gz | head -n1)
+        tar -xzf "$TARBALL" -C "${RUNNER_TEMP}/sing-box-dl"
+        BIN=$(find "${RUNNER_TEMP}/sing-box-dl" -type f -name sing-box | head -n1)
+        install -m 0755 "$BIN" "${RUNNER_TEMP}/bin/sing-box"
+        echo "${RUNNER_TEMP}/bin" >> "$GITHUB_PATH"
+        "${RUNNER_TEMP}/bin/sing-box" version

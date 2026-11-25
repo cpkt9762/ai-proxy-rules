@@ -2,6 +2,8 @@ export const formats = [
   "surge",
   "clash",
   "sing-box",
+  "sing-box-domain",
+  "sing-box-ip",
   "quantumult-x",
   "loon",
   "shadowrocket",
