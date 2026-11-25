@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "rules": [
+    {
+      "domain": [
+        "api.hunyuan.cloud.tencent.com",
+        "api.minimax.io",
+        "api.minimaxi.com",
+        "hunyuan.tencentcloudapi.com"
+      ],
+      "domain_suffix": [
+        "bfl.ai",
+        "civitai.com",
+        "clipdrop.co",
+        "comfy.org",
+        "comfyregistry.org",
+        "descript.com",
+        "elevenlabs.com",
+        "elevenlabs.io",
+        "elevenlabsusercontent.com",
+        "firefly.adobe.com",
+        "firefly.adobe.io",
+        "hailuoai.com",
+        "heygen.com",
+        "hunyuan.tencent.com",
+        "ideogram.ai",
+        "leonardo.ai",
+        "lovart.ai",
+        "lumalabs.ai",
+        "midjourney.com",
+        "openart.ai",
+        "pika.art",
+        "recraft.ai",
+        "runway.com",
+        "runwayml.com",
+        "stability.ai",
+        "suno.ai",
+        "suno.com",
+        "synthesia.io",
+        "udio.com",
+        "xingyeai.com",
+        "yuanbao.tencent.com",
+        "yuanqi.tencent.com"
+      ]
+    }
+  ]
+}

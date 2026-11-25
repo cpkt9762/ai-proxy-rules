@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "rules": [
+    {
+      "domain": [
+        "api.hunyuan.cloud.tencent.com",
+        "api.minimax.io",
+        "api.minimaxi.com",
+        "hunyuan.tencentcloudapi.com"
+      ],
+      "domain_suffix": [
+        "hailuoai.com",
+        "hunyuan.tencent.com",
+        "xingyeai.com",
+        "yuanbao.tencent.com",
+        "yuanqi.tencent.com"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "rules": [
+    {
+      "domain_suffix": [
+        "kiro.dev",
+        "q.eu-central-1.amazonaws.com",
+        "q.us-east-1.amazonaws.com"
+      ]
+    }
+  ]
+}
